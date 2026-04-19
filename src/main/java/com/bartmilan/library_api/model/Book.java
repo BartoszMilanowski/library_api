@@ -2,7 +2,7 @@ package com.bartmilan.library_api.model;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -23,7 +23,7 @@ public class Book {
     private String description;
 
     @Column(nullable = false)
-    private Date releaseDate;
+    private LocalDate releaseDate;
 
     @Column(nullable = false)
     private String isbn;
@@ -42,7 +42,7 @@ public class Book {
     public Book() {
     }
 
-    public Book(String polishTitle, String originalTitle, String description, Date releaseDate, String isbn,
+    public Book(String polishTitle, String originalTitle, String description, LocalDate releaseDate, String isbn,
                 List<Author> authors, Publisher publisher, String coverUrl) {
         this.polishTitle = polishTitle;
         this.originalTitle = originalTitle;
@@ -86,11 +86,11 @@ public class Book {
         this.description = description;
     }
 
-    public Date getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
