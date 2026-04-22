@@ -12,9 +12,8 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    List<Book> findByPolishTitleOrOriginalTitle(String polishTitle, String originalTitle);
-
-    @Query("SELECT b FROM Book b WHERE LOWER(b.polishTitle) LIKE LOWER(CONCAT '%', :phrase, '%')) OR " +
+    @Query("SELECT b FROM Book b WHERE " +
+            "LOWER(b.polishTitle) LIKE LOWER(CONCAT('%', :phrase, '%')) OR " +
             "LOWER(b.originalTitle) LIKE LOWER(CONCAT('%', :phrase, '%'))")
     List<Book> searchByTitle(@Param("phrase") String phrase);
 
@@ -22,9 +21,12 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByAuthors_Id(Long authorId);
 
-    List<Book> findByAuthors_LastName(String authorLastName);
-
     List<Book> findByPublisher_Id(Long publisherId);
 
     List<Book> findByPublisher_Name(String publisherName);
+
+    @Query("SELECT b FROM Book b JOIN b.authors a WHERE " +
+            "LOWER(a.firstName) LIKE LOWER(CONCAT('%', :phrase, '%')) OR " +
+            "LOWER(a.lastName) LIKE LOWER(CONCAT('%', :phrase, '%'))")
+    List<Book> searchByAuthorsName(@Param("phrase") String phrase);
 }

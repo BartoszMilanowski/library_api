@@ -14,7 +14,7 @@ public interface PublisherRepository extends JpaRepository<Publisher, Long> {
 
     @Query("SELECT p FROM Publisher p WEHRE " +
             "LOWER(p.name) LIKE LOWER(CONCAT('%', :phrase, '%'))")
-    List<Publisher> findByName(@Param("phrase") String phrase);
+    List<Publisher> searchByName(@Param("phrase") String phrase);
 
     Optional<Publisher> findByBooks_Id(Long bookId);
 
@@ -22,6 +22,8 @@ public interface PublisherRepository extends JpaRepository<Publisher, Long> {
             "LOWER(b.polishTitle) LIKE LOWER(CONCAT('%', :phrase, '%')) OR " +
             "LOWER(b.originalTitle) LIKE LOWER(CONCAT('%', :phrase, '%'))")
     List<Publisher> findByBookTitle(@Param("phrase") String phrase);
+
+    Optional<Publisher> findByName(String name);
 
 
 }
