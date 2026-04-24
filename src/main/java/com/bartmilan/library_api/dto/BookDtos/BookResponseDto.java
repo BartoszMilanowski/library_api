@@ -1,4 +1,4 @@
-package com.bartmilan.library_api.dto;
+package com.bartmilan.library_api.dto.BookDtos;
 
 import java.time.LocalDate;
 import java.util.List;
