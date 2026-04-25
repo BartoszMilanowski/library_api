@@ -11,12 +11,11 @@ import com.bartmilan.library_api.model.Author;
 import com.bartmilan.library_api.model.Book;
 import com.bartmilan.library_api.model.Publisher;
 import com.bartmilan.library_api.repository.BookRepository;
-import com.bartmilan.library_api.specyfication.BookSpecification;
+import com.bartmilan.library_api.specification.BookSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,45 +52,10 @@ public class BookService {
                 .toList();
     }
 
-    public List<BookResponseDto> getByTitle(String title) {
-        return bookRepository.searchByTitle(title)
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
-    }
-
     public BookResponseDto getByIsbn(String isbn) {
         return bookRepository.findByIsbn(isbn)
                 .map(bookMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with isbn: " + isbn));
-    }
-
-    public List<BookResponseDto> getByAuthorId(Long authorId) {
-        return bookRepository.findByAuthors_Id(authorId)
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
-    }
-
-    public List<BookResponseDto> getByAuthorsName(String authorName) {
-        return bookRepository.searchByAuthorsName(authorName)
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
-    }
-
-    public List<BookResponseDto> getByPublisherId(Long publisherId) {
-        return bookRepository.findByPublisher_Id(publisherId)
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
-    }
-
-    public List<BookResponseDto> getByPublisherName(String publisherName) {
-        return bookRepository.findByPublisher_Name(publisherName)
-                .stream()
-                .map(bookMapper::toDto)
-                .toList();
     }
 
     public BookResponseDto create(BookRequestDto bookRequestDto) {

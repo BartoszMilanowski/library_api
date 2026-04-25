@@ -1,4 +1,4 @@
-package com.bartmilan.library_api.specyfication;
+package com.bartmilan.library_api.specification;
 
 import com.bartmilan.library_api.model.Author;
 import com.bartmilan.library_api.model.Book;
@@ -22,8 +22,8 @@ public class BookSpecification {
         return (root, query, cb) -> {
             Join<Book, Author> authors = root.join("authors");
             return cb.or(
-                    cb.like(cb.lower(root.get("firstName")), "%" + phrase.toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get("lastName")), "%" + phrase.toLowerCase() + "%")
+                    cb.like(cb.lower(authors.get("firstName")), "%" + phrase.toLowerCase() + "%"),
+                    cb.like(cb.lower(authors.get("lastName")), "%" + phrase.toLowerCase() + "%")
             );
         };
     }

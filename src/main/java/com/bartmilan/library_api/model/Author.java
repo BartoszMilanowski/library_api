@@ -2,8 +2,9 @@ package com.bartmilan.library_api.model;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
+
 
 @Entity
 @Table(name = "authors")
@@ -23,10 +24,10 @@ public class Author {
     private String description;
 
     @Column(nullable = false)
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column
-    private Date deathDate;
+    private LocalDate deathDate;
 
     @ManyToMany
     @JoinTable(name = "books_authors")
@@ -35,13 +36,21 @@ public class Author {
     public Author() {
     }
 
-    public Author(String lastName, String firstName, String description, Date birthDate, Date deathDate, List<Book> books) {
+    public Author(String lastName, String firstName, String description, LocalDate birthDate, LocalDate deathDate, List<Book> books) {
         this.lastName = lastName;
         this.firstName = firstName;
         this.description = description;
         this.birthDate = birthDate;
         this.deathDate = deathDate;
         this.books = books;
+    }
+
+    public Author(String lastName, String firstName, String description, LocalDate birthDate, LocalDate deathDate) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.description = description;
+        this.birthDate = birthDate;
+        this.deathDate = deathDate;
     }
 
     public Long getId() {
@@ -76,19 +85,19 @@ public class Author {
         this.description = description;
     }
 
-    public Date getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
-    public Date getDeathDate() {
+    public LocalDate getDeathDate() {
         return deathDate;
     }
 
-    public void setDeathDate(Date deathDate) {
+    public void setDeathDate(LocalDate deathDate) {
         this.deathDate = deathDate;
     }
 
