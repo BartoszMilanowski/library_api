@@ -2,32 +2,25 @@ package com.bartmilan.library_api.mapper;
 
 import com.bartmilan.library_api.dto.AuthorDtos.AuthorRequestDto;
 import com.bartmilan.library_api.dto.AuthorDtos.AuthorResponseDto;
-import com.bartmilan.library_api.dto.AuthorDtos.BookToAuthorResponseDto;
-import com.bartmilan.library_api.dto.BookDtos.BookRequestDto;
+import com.bartmilan.library_api.dto.shared.BookBasicsDto;
 import com.bartmilan.library_api.model.Author;
-import com.bartmilan.library_api.model.Book;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorMapper {
 
+    private final BookMapper bookMapper;
+
+    public AuthorMapper(BookMapper bookMapper) {
+        this.bookMapper = bookMapper;
+    }
+
     public AuthorResponseDto toDto(Author a) {
 
-        List<Book> books = a.getBooks();
-        List<BookToAuthorResponseDto> booksDto = new ArrayList<>();
-
-        for (Book b : books) {
-
-            BookToAuthorResponseDto bookDto = new BookToAuthorResponseDto(
-                    b.getId(),
-                    b.getPolishTitle(),
-                    b.getOriginalTitle(),
-                    b.getCoverUrl()
-            );
-
-            booksDto.add(bookDto);
-        }
+        List<BookBasicsDto> booksDto = a.getBooks()
+                .stream()
+                .map(bookMapper::toBasicDto)
+                .toList();
 
         return new AuthorResponseDto(
                 a.getId(),

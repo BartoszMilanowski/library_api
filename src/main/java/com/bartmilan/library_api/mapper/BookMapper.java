@@ -4,6 +4,7 @@ import com.bartmilan.library_api.dto.BookDtos.AuthorToBookResponseDto;
 import com.bartmilan.library_api.dto.BookDtos.BookRequestDto;
 import com.bartmilan.library_api.dto.BookDtos.BookResponseDto;
 import com.bartmilan.library_api.dto.BookDtos.PublisherToBookResponseDto;
+import com.bartmilan.library_api.dto.shared.BookBasicsDto;
 import com.bartmilan.library_api.model.Author;
 import com.bartmilan.library_api.model.Book;
 import com.bartmilan.library_api.model.Publisher;
@@ -43,6 +44,15 @@ public class BookMapper {
                 b.getIsbn(),
                 authorsDto,
                 publisherDto,
+                b.getCoverUrl()
+        );
+    }
+
+    public BookBasicsDto toBasicDto(Book b) {
+        return new BookBasicsDto(
+                b.getId(),
+                b.getPolishTitle(),
+                b.getOriginalTitle(),
                 b.getCoverUrl()
         );
     }

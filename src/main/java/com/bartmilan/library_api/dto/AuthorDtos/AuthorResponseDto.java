@@ -1,5 +1,7 @@
 package com.bartmilan.library_api.dto.AuthorDtos;
 
+import com.bartmilan.library_api.dto.shared.BookBasicsDto;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,11 +12,11 @@ public class AuthorResponseDto {
     private String description;
     private LocalDate birthDate;
     private LocalDate deathDate;
-    private List<BookToAuthorResponseDto> books;
+    private List<BookBasicsDto> books;
 
     public AuthorResponseDto(Long id, String fullName, String description,
                              LocalDate birthDate, LocalDate deathDate,
-                             List<BookToAuthorResponseDto> books) {
+                             List<BookBasicsDto> books) {
         this.id = id;
         this.fullName = fullName;
         this.description = description;
@@ -43,7 +45,7 @@ public class AuthorResponseDto {
         return deathDate;
     }
 
-    public List<BookToAuthorResponseDto> getBooks() {
+    public List<BookBasicsDto> getBooks() {
         return books;
     }
 }
