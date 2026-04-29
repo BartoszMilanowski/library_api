@@ -1,10 +1,12 @@
 package com.bartmilan.library_api.service;
 
+import com.bartmilan.library_api.exception.DuplicateResourceException;
 import com.bartmilan.library_api.model.Genre;
 import com.bartmilan.library_api.repository.GenreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
 
 @Service
@@ -29,11 +31,23 @@ public class GenreService {
         return genreRepository.searchByName(name);
     }
 
-    public Genre create(Genre genre){
-        return genreRepository.save(genre);
+    public Genre create(String name, String polishName) {
+        if (!genreRepository.searchByName(name).isEmpty() || !genreRepository.searchByName(polishName).isEmpty()) {
+            throw new DuplicateResourceException("Genre with name: " + name + " and polish name: " + polishName + " already exists");
+        }
+        return genreRepository.save(new Genre(name, polishName));
     }
 
-    public void delete(Long id){
+    public Genre update(Long id, String name, String polishName) {
+        Genre current = getById(id);
+
+        current.setName(name);
+        current.setPolishName(polishName);
+
+        return genreRepository.save(current);
+    }
+
+    public void delete(Long id) {
         Genre genre = getById(id);
         genreRepository.delete(genre);
     }
