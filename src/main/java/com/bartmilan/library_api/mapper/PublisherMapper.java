@@ -3,9 +3,11 @@ package com.bartmilan.library_api.mapper;
 import com.bartmilan.library_api.dto.PublisherDtos.PublisherResponseDto;
 import com.bartmilan.library_api.dto.shared.BookBasicsDto;
 import com.bartmilan.library_api.model.Publisher;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class PublisherMapper {
 
     private final BookMapper bookMapper;

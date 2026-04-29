@@ -29,8 +29,7 @@ public class Author {
     @Column
     private LocalDate deathDate;
 
-    @ManyToMany
-    @JoinTable(name = "books_authors")
+    @ManyToMany(mappedBy = "authors")
     private List<Book> books;
 
     public Author() {

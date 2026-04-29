@@ -4,9 +4,11 @@ import com.bartmilan.library_api.dto.AuthorDtos.AuthorRequestDto;
 import com.bartmilan.library_api.dto.AuthorDtos.AuthorResponseDto;
 import com.bartmilan.library_api.dto.shared.BookBasicsDto;
 import com.bartmilan.library_api.model.Author;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class AuthorMapper {
 
     private final BookMapper bookMapper;
