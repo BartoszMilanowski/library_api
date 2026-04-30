@@ -5,6 +5,7 @@ import com.bartmilan.library_api.dto.AuthorDtos.AuthorResponseDto;
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
 import com.bartmilan.library_api.mapper.AuthorMapper;
 import com.bartmilan.library_api.model.Author;
+import com.bartmilan.library_api.model.Book;
 import com.bartmilan.library_api.repository.AuthorRepository;
 import com.bartmilan.library_api.specification.AuthorSpecification;
 import org.springframework.data.jpa.domain.Specification;
@@ -75,6 +76,16 @@ public class AuthorService {
 
     public void delete(Long id) {
         Author author = getById(id);
+
+        for (Book book : author.getBooks()) {
+            if (book.getAuthors().size() == 1) {
+                throw new IllegalStateException(
+                        "Cannot delete author - book " + book.getPolishTitle() + " has only this author"
+                );
+            }
+        }
+
+        author.getBooks().forEach(book -> book.getAuthors().remove(author));
         authorRepository.delete(author);
     }
 

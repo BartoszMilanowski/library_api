@@ -3,6 +3,7 @@ package com.bartmilan.library_api.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class Book {
 
     @ManyToMany
     @JoinTable(name = "books_authors")
-    private List<Author> authors;
+    private List<Author> authors = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "publisher_id")

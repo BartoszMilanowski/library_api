@@ -41,6 +41,7 @@ public class AuthorMapper {
                 a.getDescription(),
                 a.getBirthDate(),
                 a.getDeathDate()
+
         );
     }
 }

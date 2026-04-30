@@ -2,6 +2,7 @@ package com.bartmilan.library_api.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,7 @@ public class Publisher {
     private String name;
 
     @OneToMany(mappedBy = "publisher")
-    List<Book> books;
+    List<Book> books = new ArrayList<>();
 
     public Publisher() {
     }

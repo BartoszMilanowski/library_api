@@ -76,7 +76,7 @@ public class BookService {
     }
 
     public List<BookResponseDto> search(String title, String authorName, Long authorId,
-                                        Long publisherId, String publisherName) {
+                                        Long publisherId, String publisherName, Integer year) {
 
         Specification<Book> spec = (root, query, cb) -> cb.conjunction();
 
@@ -85,6 +85,7 @@ public class BookService {
         if (authorId != null) spec = spec.and(BookSpecification.authorIdEquals(authorId));
         if (publisherId != null) spec = spec.and(BookSpecification.publisherIdEquals(publisherId));
         if (publisherName != null) spec = spec.and(BookSpecification.publisherNameContains(publisherName));
+        if (year != null) spec = spec.and(BookSpecification.releaseDateYearIsEqual(year));
 
         return bookRepository.findAll(spec)
                 .stream()
@@ -108,7 +109,8 @@ public class BookService {
         current.setDescription(requestDto.getDescription());
         current.setReleaseDate(requestDto.getReleaseDate());
         current.setIsbn(requestDto.getIsbn());
-        current.setAuthors(authors);
+        current.getAuthors().clear();
+        current.getAuthors().addAll(authors);
         current.setPublisher(publisher);
         current.setCoverUrl(requestDto.getCoverUrl());
 

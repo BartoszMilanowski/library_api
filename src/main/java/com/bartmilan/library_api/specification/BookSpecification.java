@@ -43,4 +43,12 @@ public class BookSpecification {
                 cb.like(cb.lower(root.get("publisher").get("name")), "%" + phrase.toLowerCase() + "%");
     }
 
+    public static Specification<Book> releaseDateYearIsEqual(Integer year) {
+        return (root, query, cb) ->
+                cb.equal(
+                        cb.function("YEAR", Integer.class, root.get("releaseDate")),
+                        year
+                );
+    }
+
 }

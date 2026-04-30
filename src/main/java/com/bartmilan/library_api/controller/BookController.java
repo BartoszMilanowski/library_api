@@ -40,9 +40,10 @@ public class BookController {
             @RequestParam(required = false) String authorName,
             @RequestParam(required = false) String publisherName,
             @RequestParam(required = false) Long authorId,
-            @RequestParam(required = false) Long publisherId
+            @RequestParam(required = false) Long publisherId,
+            @RequestParam(required = false) Integer year
     ) {
-        return ResponseEntity.ok(bookService.search(title, authorName, authorId, publisherId, publisherName));
+        return ResponseEntity.ok(bookService.search(title, authorName, authorId, publisherId, publisherName, year));
     }
 
     @PostMapping

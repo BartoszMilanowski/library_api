@@ -44,7 +44,7 @@ public class PublisherController {
         return ResponseEntity.status(HttpStatus.CREATED).body(publisherService.create(name));
     }
 
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<PublisherResponseDto> update(
             @PathVariable Long id,
             @RequestParam String name
