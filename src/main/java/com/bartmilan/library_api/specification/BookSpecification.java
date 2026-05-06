@@ -3,6 +3,8 @@ package com.bartmilan.library_api.specification;
 import com.bartmilan.library_api.model.Author;
 import com.bartmilan.library_api.model.Book;
 
+import com.bartmilan.library_api.model.BookCopy;
+import com.bartmilan.library_api.model.enums.BookCopyStatus;
 import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -49,6 +51,12 @@ public class BookSpecification {
                         cb.function("YEAR", Integer.class, root.get("releaseDate")),
                         year
                 );
+    }
+    public static Specification<Book> hasAvailableCopies() {
+        return (root, query, cb) -> {
+            Join<Book, BookCopy> copies = root.join("copies");
+            return cb.equal(copies.get("status"), BookCopyStatus.AVAILABLE);
+        };
     }
 
 }

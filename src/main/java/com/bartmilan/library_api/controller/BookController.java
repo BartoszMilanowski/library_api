@@ -41,9 +41,11 @@ public class BookController {
             @RequestParam(required = false) String publisherName,
             @RequestParam(required = false) Long authorId,
             @RequestParam(required = false) Long publisherId,
-            @RequestParam(required = false) Integer year
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) boolean available
     ) {
-        return ResponseEntity.ok(bookService.search(title, authorName, authorId, publisherId, publisherName, year));
+        return ResponseEntity.ok(bookService.search(title, authorName, authorId, publisherId,
+                publisherName, year, available));
     }
 
     @PostMapping
