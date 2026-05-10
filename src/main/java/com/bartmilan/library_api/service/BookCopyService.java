@@ -4,7 +4,10 @@ import com.bartmilan.library_api.exception.BookNotAvailableException;
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
 import com.bartmilan.library_api.model.BookCopy;
 import com.bartmilan.library_api.model.enums.BookCopyStatus;
+import com.bartmilan.library_api.model.enums.ReservationStatus;
 import com.bartmilan.library_api.repository.BookCopyRepository;
+import com.bartmilan.library_api.repository.ReservationRepository;
+import com.bartmilan.library_api.specification.ReservationSpecification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,10 +15,13 @@ import java.util.List;
 @Service
 public class BookCopyService {
 
-    private BookCopyRepository bookCopyRepository;
+    private final BookCopyRepository bookCopyRepository;
+    private final ReservationRepository reservationRepository;
 
-    public BookCopyService(BookCopyRepository bookCopyRepository) {
+    public BookCopyService(BookCopyRepository bookCopyRepository, ReservationRepository reservationRepository) {
+
         this.bookCopyRepository = bookCopyRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     public BookCopy getById(Long id) {
@@ -27,16 +33,9 @@ public class BookCopyService {
         return bookCopyRepository.findByBook_IdAndStatus(bookId, BookCopyStatus.AVAILABLE);
     }
 
-    public boolean isBookAvailable(Long bookId) {
-        return bookCopyRepository.existByBook_IdAndStatus(bookId, BookCopyStatus.AVAILABLE);
-    }
+    public BookCopy borrowCopy(Long bookCopyId) {
 
-    public BookCopy borrowCopy(Long bookId) {
-        BookCopy copy = bookCopyRepository.findByBook_IdAndStatus(bookId, BookCopyStatus.AVAILABLE)
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new BookNotAvailableException("No available copies for book with id: " + bookId));
-
+        BookCopy copy = getById(bookCopyId);
         copy.setStatus(BookCopyStatus.BORROWED);
         return bookCopyRepository.save(copy);
     }
@@ -51,6 +50,23 @@ public class BookCopyService {
         BookCopy copy = getById(copyId);
         copy.setStatus(BookCopyStatus.DISCONTINUED);
         bookCopyRepository.save(copy);
+    }
+
+    public int countAvailableCopies(Long bookId) {
+        int available = bookCopyRepository
+                .findByBook_IdAndStatus(bookId, BookCopyStatus.AVAILABLE)
+                .size();
+
+        int pendingReservations = reservationRepository
+                .findAll(ReservationSpecification.bookIdEquals(bookId)
+                        .and(ReservationSpecification.statusEquals(ReservationStatus.PENDING)))
+                .size();
+
+        return available - pendingReservations;
+    }
+
+    public boolean isBookAvailable(Long bookId) {
+        return countAvailableCopies(bookId) > 0;
     }
 
 

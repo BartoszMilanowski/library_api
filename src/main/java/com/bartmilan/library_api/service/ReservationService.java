@@ -1,6 +1,7 @@
 package com.bartmilan.library_api.service;
 
 import com.bartmilan.library_api.dto.ReservationDtos.ReservationRequestDto;
+import com.bartmilan.library_api.exception.BookNotAvailableException;
 import com.bartmilan.library_api.exception.DuplicateResourceException;
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
 import com.bartmilan.library_api.model.Book;
@@ -11,6 +12,8 @@ import com.bartmilan.library_api.model.User;
 import com.bartmilan.library_api.repository.ReservationRepository;
 import com.bartmilan.library_api.specification.ReservationSpecification;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,16 +22,19 @@ import java.util.List;
 @Service
 public class ReservationService {
 
-    private ReservationRepository reservationRepository;
-    private BookService bookService;
-    private UserService userService;
+    private final ReservationRepository reservationRepository;
+    private final BookService bookService;
+    private final UserService userService;
+    private final BookCopyService bookCopyService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               BookService bookService,
-                              UserService userService) {
+                              UserService userService,
+                              BookCopyService bookCopyService) {
         this.reservationRepository = reservationRepository;
         this.bookService = bookService;
         this.userService = userService;
+        this.bookCopyService = bookCopyService;
     }
 
     public Reservation getById(Long id) {
@@ -66,14 +72,11 @@ public class ReservationService {
         Book b = bookService.getById(r.getBookId());
         User u = userService.getById(r.getUserId());
 
-        boolean alreadyReserved = !reservationRepository
-                .findAll(ReservationSpecification.bookIdEquals(r.getBookId())
-                        .and(ReservationSpecification.userIdEquals(r.getUserId()))
-                        .and(ReservationSpecification.statusEquals(ReservationStatus.PENDING))
-                )
-                .isEmpty();
+        if (!bookCopyService.isBookAvailable(r.getBookId())) {
+            throw new BookNotAvailableException("No available copies for book with id: " + r.getBookId());
+        }
 
-        if (alreadyReserved) {
+        if (hasActiveReservation(r.getBookId(), r.getUserId())) {
             throw new DuplicateResourceException("User already has an active reservation for book with id: " + r.getBookId());
         }
 
@@ -102,6 +105,30 @@ public class ReservationService {
 
     public void delete(Long id) {
         reservationRepository.delete(getById(id));
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void cancelExpiredReservation() {
+        List<Reservation> expired = reservationRepository
+                .findAll(ReservationSpecification.statusEquals(ReservationStatus.PENDING)
+                        .and(ReservationSpecification.dateBetween(
+                                ReservationDateType.EXPIRATION, null, LocalDate.now()
+                        )));
+
+        expired.forEach(r -> {
+            r.setStatus(ReservationStatus.CANCELLED);
+            reservationRepository.save(r);
+        });
+    }
+
+    public boolean hasActiveReservation(Long bookId, Long userId) {
+
+        return !reservationRepository
+                .findAll(ReservationSpecification.bookIdEquals(bookId)
+                        .and(ReservationSpecification.userIdEquals(userId))
+                        .and(ReservationSpecification.statusEquals(ReservationStatus.PENDING))
+                )
+                .isEmpty();
     }
 
 }

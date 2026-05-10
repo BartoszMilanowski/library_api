@@ -40,11 +40,14 @@ public class Book {
     @Column
     private String coverUrl;
 
+    @OneToMany(mappedBy = "book")
+    private List<BookCopy> copies = new ArrayList<>();
+
     public Book() {
     }
 
-    public Book(String polishTitle, String originalTitle, String description, LocalDate releaseDate, String isbn,
-                List<Author> authors, Publisher publisher, String coverUrl) {
+    public Book(String polishTitle, String originalTitle, String description, LocalDate releaseDate,
+                String isbn, List<Author> authors, Publisher publisher, String coverUrl, List<BookCopy> copies) {
         this.polishTitle = polishTitle;
         this.originalTitle = originalTitle;
         this.description = description;
@@ -53,6 +56,7 @@ public class Book {
         this.authors = authors;
         this.publisher = publisher;
         this.coverUrl = coverUrl;
+        this.copies = copies;
     }
 
     public Long getId() {
@@ -125,5 +129,13 @@ public class Book {
 
     public void setCoverUrl(String coverUrl) {
         this.coverUrl = coverUrl;
+    }
+
+    public List<BookCopy> getCopies() {
+        return copies;
+    }
+
+    public void setCopies(List<BookCopy> copies) {
+        this.copies = copies;
     }
 }

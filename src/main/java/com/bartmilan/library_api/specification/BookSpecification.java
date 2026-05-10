@@ -52,6 +52,14 @@ public class BookSpecification {
                         year
                 );
     }
+
+    public static Specification<Book> bookCopyIdEquals(Long bookCopyId) {
+        return (root, query, cb) -> {
+            Join<Book, BookCopy> copies = root.join("copies");
+            return cb.equal(copies.get("id"), bookCopyId);
+        };
+    }
+
     public static Specification<Book> hasAvailableCopies() {
         return (root, query, cb) -> {
             Join<Book, BookCopy> copies = root.join("copies");

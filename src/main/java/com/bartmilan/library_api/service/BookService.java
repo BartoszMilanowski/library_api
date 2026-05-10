@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService {
@@ -92,6 +93,13 @@ public class BookService {
                 .stream()
                 .map(bookMapper::toDto)
                 .toList();
+    }
+
+    public Book searchByBookCopyId(Long bookCopyId) {
+        return bookRepository.findAll(BookSpecification.bookCopyIdEquals(bookCopyId))
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found for copy with id: " + bookCopyId));
     }
 
     public BookResponseDto update(Long id, BookRequestDto requestDto) {
