@@ -2,6 +2,7 @@ package com.bartmilan.library_api.controller;
 
 import com.bartmilan.library_api.dto.BookDtos.BookRequestDto;
 import com.bartmilan.library_api.dto.BookDtos.BookResponseDto;
+import com.bartmilan.library_api.model.Reservation;
 import com.bartmilan.library_api.service.BookService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
