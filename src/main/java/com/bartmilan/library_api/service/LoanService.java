@@ -4,7 +4,6 @@ import com.bartmilan.library_api.dto.LoanDtos.LoanRequestDto;
 import com.bartmilan.library_api.exception.BookNotAvailableException;
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
 import com.bartmilan.library_api.model.*;
-import com.bartmilan.library_api.model.enums.BookCopyStatus;
 import com.bartmilan.library_api.model.enums.LoanDateType;
 import com.bartmilan.library_api.model.enums.LoanStatus;
 import com.bartmilan.library_api.model.enums.ReservationStatus;
@@ -13,9 +12,9 @@ import com.bartmilan.library_api.specification.LoanSpecification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,6 +65,7 @@ public class LoanService {
         return loanRepository.findAll(spec).stream().toList();
     }
 
+    @Transactional
     public Loan create(LoanRequestDto l) {
 
         Book book = bookService.searchByBookCopyId(l.getBookCopyId());
@@ -113,16 +113,18 @@ public class LoanService {
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void markAsOverDue(){
+    public void markAsOverDue() {
         List<Loan> overdue = loanRepository
                 .findAll(LoanSpecification.statusEquals(LoanStatus.ACTIVE)
                         .and(LoanSpecification.dateBetween(LoanDateType.DUE, null, LocalDate.now()))
                 );
 
-        overdue.forEach(l -> {
-            l.setStatus(LoanStatus.OVERDUE);
-            loanRepository.save(l);
-        });
+        overdue.forEach(l -> l.setStatus(LoanStatus.OVERDUE));
+        loanRepository.saveAll(overdue);
+    }
+
+    public void delete(Long id) {
+        loanRepository.delete(getById(id));
     }
 
 
