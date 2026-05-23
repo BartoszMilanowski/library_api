@@ -1,8 +1,10 @@
 package com.bartmilan.library_api.service;
 
 import com.bartmilan.library_api.dto.LoanDtos.LoanRequestDto;
+import com.bartmilan.library_api.dto.LoanDtos.LoanResponseDto;
 import com.bartmilan.library_api.exception.BookNotAvailableException;
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
+import com.bartmilan.library_api.mapper.LoanMapper;
 import com.bartmilan.library_api.model.*;
 import com.bartmilan.library_api.model.enums.LoanDateType;
 import com.bartmilan.library_api.model.enums.LoanStatus;
@@ -26,19 +28,24 @@ public class LoanService {
     private final UserService userService;
     private final ReservationService reservationService;
     private final BookService bookService;
+    private final LoanMapper loanMapper;
 
     public LoanService(LoanRepository loanRepository, BookCopyService bookCopyService,
                        UserService userService, ReservationService reservationService,
-                       BookService bookService) {
+                       BookService bookService, LoanMapper loanMapper) {
         this.loanRepository = loanRepository;
         this.bookCopyService = bookCopyService;
         this.userService = userService;
         this.reservationService = reservationService;
         this.bookService = bookService;
+        this.loanMapper = loanMapper;
     }
 
-    public List<Loan> getAll() {
-        return loanRepository.findAll();
+    public List<LoanResponseDto> getAll() {
+        return loanRepository.findAll()
+                .stream()
+                .map(loanMapper::toDto)
+                .toList();
     }
 
     public Loan getById(Long id) {
@@ -46,9 +53,15 @@ public class LoanService {
                 .orElseThrow(() -> new ResourceNotFoundException("Loan not found with id: " + id));
     }
 
-    public List<Loan> search(Long bookCopyId, Long userId, LoanStatus status, LocalDate loanDateFrom, LocalDate loanDateTo,
-                             LocalDate dueDateFrom, LocalDate dueDateTo, LocalDate returnDateFrom,
-                             LocalDate returnDateTo, Long bookId) {
+    public LoanResponseDto getDtoById(Long id) {
+        return loanRepository.findById(id)
+                .map(loanMapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan not found with id: " + id));
+    }
+
+    public List<LoanResponseDto> search(Long bookCopyId, Long userId, LoanStatus status, LocalDate loanDateFrom, LocalDate loanDateTo,
+                                        LocalDate dueDateFrom, LocalDate dueDateTo, LocalDate returnDateFrom,
+                                        LocalDate returnDateTo, Long bookId) {
         Specification<Loan> spec = (root, query, cb) -> cb.conjunction();
 
         if (bookCopyId != null) spec = spec.and(LoanSpecification.bookCopyIdEquals(bookCopyId));
@@ -62,11 +75,14 @@ public class LoanService {
                 spec.and(LoanSpecification.dateBetween(LoanDateType.RETURN, returnDateFrom, returnDateTo));
         if (bookId != null) spec = spec.and(LoanSpecification.bookIdEquals(bookId));
 
-        return loanRepository.findAll(spec).stream().toList();
+        return loanRepository.findAll(spec)
+                .stream()
+                .map(loanMapper::toDto)
+                .toList();
     }
 
     @Transactional
-    public Loan create(LoanRequestDto l) {
+    public LoanResponseDto create(LoanRequestDto l) {
 
         Book book = bookService.searchByBookCopyId(l.getBookCopyId());
         BookCopy bookCopy = bookCopyService.getById(l.getBookCopyId());
@@ -99,7 +115,7 @@ public class LoanService {
 
         r.ifPresent(reservation -> reservationService.fulfill(reservation.getId()));
 
-        return saved;
+        return loanMapper.toDto(saved);
     }
 
     public void returnBook(Long loanId) {

@@ -1,6 +1,7 @@
 package com.bartmilan.library_api.controller;
 
 import com.bartmilan.library_api.dto.LoanDtos.LoanRequestDto;
+import com.bartmilan.library_api.dto.LoanDtos.LoanResponseDto;
 import com.bartmilan.library_api.model.Loan;
 import com.bartmilan.library_api.model.enums.LoanStatus;
 import com.bartmilan.library_api.service.LoanService;
@@ -22,17 +23,17 @@ public class LoanController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Loan>> getAll() {
+    public ResponseEntity<List<LoanResponseDto>> getAll() {
         return ResponseEntity.ok(loanService.getAll());
     }
 
     @GetMapping("/{loanId}")
-    public ResponseEntity<Loan> getById(@PathVariable Long loanId) {
-        return ResponseEntity.ok(loanService.getById(loanId));
+    public ResponseEntity<LoanResponseDto> getById(@PathVariable Long loanId) {
+        return ResponseEntity.ok(loanService.getDtoById(loanId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Loan>> search(
+    public ResponseEntity<List<LoanResponseDto>> search(
             @RequestParam(required = false) Long bookCopyId,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) LoanStatus status,
@@ -49,7 +50,7 @@ public class LoanController {
     }
 
     @PostMapping
-    public ResponseEntity<Loan> create(@RequestBody LoanRequestDto dto) {
+    public ResponseEntity<LoanResponseDto> create(@RequestBody LoanRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(loanService.create(dto));
     }

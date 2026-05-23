@@ -59,6 +59,18 @@ public class Book {
         this.copies = copies;
     }
 
+    public Book(String polishTitle, String originalTitle, String description, LocalDate releaseDate,
+                String isbn, List<Author> authors, Publisher publisher, String coverUrl) {
+        this.polishTitle = polishTitle;
+        this.originalTitle = originalTitle;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.isbn = isbn;
+        this.authors = authors;
+        this.publisher = publisher;
+        this.coverUrl = coverUrl;
+    }
+
     public Long getId() {
         return id;
     }
