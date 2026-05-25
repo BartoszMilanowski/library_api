@@ -1,9 +1,11 @@
 package com.bartmilan.library_api.service;
 
 import com.bartmilan.library_api.dto.ReservationDtos.ReservationRequestDto;
+import com.bartmilan.library_api.dto.ReservationDtos.ReservationResponseDto;
 import com.bartmilan.library_api.exception.BookNotAvailableException;
 import com.bartmilan.library_api.exception.DuplicateResourceException;
 import com.bartmilan.library_api.exception.ResourceNotFoundException;
+import com.bartmilan.library_api.mapper.ReservationMapper;
 import com.bartmilan.library_api.model.Book;
 import com.bartmilan.library_api.model.Reservation;
 import com.bartmilan.library_api.model.enums.ReservationDateType;
@@ -26,15 +28,18 @@ public class ReservationService {
     private final BookService bookService;
     private final UserService userService;
     private final BookCopyService bookCopyService;
+    private final ReservationMapper reservationMapper;
 
     public ReservationService(ReservationRepository reservationRepository,
                               BookService bookService,
                               UserService userService,
-                              BookCopyService bookCopyService) {
+                              BookCopyService bookCopyService,
+                              ReservationMapper reservationMapper) {
         this.reservationRepository = reservationRepository;
         this.bookService = bookService;
         this.userService = userService;
         this.bookCopyService = bookCopyService;
+        this.reservationMapper = reservationMapper;
     }
 
     public Reservation getById(Long id) {
@@ -42,15 +47,26 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
     }
 
-    public List<Reservation> getAll() {
-        return reservationRepository.findAll();
+    public ReservationResponseDto getDtoById(Long id) {
+        return reservationRepository.findById(id)
+                .map(reservationMapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
     }
 
-    public List<Reservation> search(Long bookId, Long userId,
-                                    ReservationStatus status, LocalDate reservationDateFrom,
-                                    LocalDate reservationDateTo,
-                                    LocalDate expirationDateFrom,
-                                    LocalDate expirationDateTo) {
+    public List<ReservationResponseDto> getAll() {
+
+        return reservationRepository
+                .findAll()
+                .stream()
+                .map(reservationMapper::toDto)
+                .toList();
+    }
+
+    public List<ReservationResponseDto> search(Long bookId, Long userId,
+                                               ReservationStatus status, LocalDate reservationDateFrom,
+                                               LocalDate reservationDateTo,
+                                               LocalDate expirationDateFrom,
+                                               LocalDate expirationDateTo) {
 
         Specification<Reservation> spec = (root, query, cb) -> cb.conjunction();
 
@@ -64,10 +80,11 @@ public class ReservationService {
 
         return reservationRepository.findAll(spec)
                 .stream()
+                .map(reservationMapper::toDto)
                 .toList();
     }
 
-    public Reservation create(ReservationRequestDto r) {
+    public ReservationResponseDto create(ReservationRequestDto r) {
 
         Book b = bookService.getById(r.getBookId());
         User u = userService.getById(r.getUserId());
@@ -88,7 +105,9 @@ public class ReservationService {
                 ReservationStatus.PENDING
         );
 
-        return reservationRepository.save(reservation);
+        Reservation saved = reservationRepository.save(reservation);
+
+        return reservationMapper.toDto(saved);
     }
 
     public void fulfill(Long id) {

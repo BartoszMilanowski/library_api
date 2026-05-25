@@ -2,6 +2,7 @@ package com.bartmilan.library_api.controller;
 
 import com.bartmilan.library_api.dto.ReservationDtos.ReservationRequestDto;
 
+import com.bartmilan.library_api.dto.ReservationDtos.ReservationResponseDto;
 import com.bartmilan.library_api.model.Reservation;
 import com.bartmilan.library_api.model.enums.ReservationStatus;
 import com.bartmilan.library_api.service.ReservationService;
@@ -23,17 +24,17 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Reservation>> getAll() {
+    public ResponseEntity<List<ReservationResponseDto>> getAll() {
         return ResponseEntity.ok(reservationService.getAll());
     }
 
     @GetMapping("/{reservationId}")
-    public ResponseEntity<Reservation> getById(@PathVariable Long reservationId) {
-        return ResponseEntity.ok(reservationService.getById(reservationId));
+    public ResponseEntity<ReservationResponseDto> getById(@PathVariable Long reservationId) {
+        return ResponseEntity.ok(reservationService.getDtoById(reservationId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Reservation>> search(
+    public ResponseEntity<List<ReservationResponseDto>> search(
             @RequestParam(required = false) Long bookId,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) ReservationStatus status,
@@ -47,7 +48,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<Reservation> reserveBook(@RequestBody ReservationRequestDto dto) {
+    public ResponseEntity<ReservationResponseDto> reserveBook(@RequestBody ReservationRequestDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reservationService.create(dto));
     }
