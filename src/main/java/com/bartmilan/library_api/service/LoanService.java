@@ -88,7 +88,7 @@ public class LoanService {
         BookCopy bookCopy = bookCopyService.getById(l.getBookCopyId());
         User user = userService.getById(l.getUserId());
 
-        Optional<Reservation> r = reservationService.search(
+        Optional<Reservation> r = reservationService.searchForEntity(
                         book.getId(), user.getId(),
                         ReservationStatus.PENDING,
                         null, null, null, null

@@ -14,5 +14,5 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
 
     List<BookCopy> findByBook_IdAndStatus(Long bookId, BookCopyStatus status);
 
-    boolean existByBook_IdAndStatus(Long bookId, BookCopyStatus status);
+    boolean existsByBook_IdAndStatus(Long bookId, BookCopyStatus status);
 }

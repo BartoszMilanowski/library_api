@@ -31,7 +31,7 @@ public class ReservationController {
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationResponseDto> getById(@PathVariable Long reservationId) {
         return ResponseEntity.ok(reservationService.getDtoById(reservationId));
-    }k
+    }
 
     @GetMapping("/search")
     public ResponseEntity<List<ReservationResponseDto>> search(

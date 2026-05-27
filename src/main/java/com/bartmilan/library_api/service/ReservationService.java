@@ -84,6 +84,27 @@ public class ReservationService {
                 .toList();
     }
 
+    public List<Reservation> searchForEntity(Long bookId, Long userId,
+                                               ReservationStatus status, LocalDate reservationDateFrom,
+                                               LocalDate reservationDateTo,
+                                               LocalDate expirationDateFrom,
+                                               LocalDate expirationDateTo) {
+
+        Specification<Reservation> spec = (root, query, cb) -> cb.conjunction();
+
+        if (bookId != null) spec = spec.and(ReservationSpecification.bookIdEquals(bookId));
+        if (userId != null) spec = spec.and(ReservationSpecification.userIdEquals(userId));
+        if (status != null) spec = spec.and(ReservationSpecification.statusEquals(status));
+        if (reservationDateFrom != null || reservationDateTo != null) spec =
+                spec.and(ReservationSpecification.dateBetween(ReservationDateType.RESERVATION, reservationDateFrom, reservationDateTo));
+        if (expirationDateFrom != null || expirationDateTo != null) spec =
+                spec.and(ReservationSpecification.dateBetween(ReservationDateType.EXPIRATION, expirationDateFrom, expirationDateTo));
+
+        return reservationRepository.findAll(spec)
+                .stream()
+                .toList();
+    }
+
     public ReservationResponseDto create(ReservationRequestDto r) {
 
         Book b = bookService.getById(r.getBookId());
